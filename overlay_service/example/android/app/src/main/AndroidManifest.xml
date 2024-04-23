@@ -1,10 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
     <application
-        android:label="blue_light_filter_main"
+        android:label="overlay_service_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -28,19 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name="com.example.overlay_service.overlay.OverlayService" android:exported="false"/>
-
-<!--        <service android:name="slayer.accessibility.service.flutter_accessibility_service.AccessibilityListener"-->
-<!--                android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.accessibilityservice.AccessibilityService" />-->
-<!--            </intent-filter>-->
-<!--            <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibilityservice" />-->
-<!--        </service>-->
-
-<!--        <service android:name="flutter.overlay.window.flutter_overlay_window.OverlayService" -->
-<!--            android:exported="false" />-->
-
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
