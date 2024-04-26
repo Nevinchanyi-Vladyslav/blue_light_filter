@@ -34,7 +34,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FilterPage(),
+      home: FilterPageProvider(),
     );
   }
 }

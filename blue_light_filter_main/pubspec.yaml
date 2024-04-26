@@ -13,7 +13,6 @@ dependencies:
     path: ../blue_light_filter_core
   overlay_service: 
     path: ../overlay_service
-  
 
 dev_dependencies:
   flutter_test:

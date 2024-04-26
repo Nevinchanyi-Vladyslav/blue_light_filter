@@ -1,4 +1,4 @@
-name: blue_light_filter_core
+name: tempature_color_converter
 description: "A new Flutter package project."
 version: 0.0.1
 homepage:
@@ -11,16 +11,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_accessibility_service: ^0.2.4
-  logger: ^2.2.0
-  overlay_service: 
-    path: ../overlay_service
-  flutter_bloc: ^8.1.5
-  eva_icons_flutter: ^3.1.0
-  material_design_icons_flutter: ^7.0.7296
-  equatable: ^2.0.5
-  tempature_color_converter:
-   path: ../tempature_color_converter
 
 dev_dependencies:
   flutter_test:
