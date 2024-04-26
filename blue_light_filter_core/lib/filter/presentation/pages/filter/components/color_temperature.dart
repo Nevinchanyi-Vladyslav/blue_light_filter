@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:blue_light_filter_core/filter/presentation/pages/filter/widgets/color_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,9 +15,23 @@ class ColorTemperature extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Color Temperature',
-          style: Theme.of(context).textTheme.headlineSmall,
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Color Temperature',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            BlocBuilder<ColorTemperatureCubit, ColorTemperatureState>(
+              builder: (_, state) {
+                return Text(
+                  '${state.temperature}K',
+                  style: Theme.of(context).textTheme.labelLarge,
+                );
+              },
+            )
+          ],
         ),
         Text(
           'Predefined temperatures',
@@ -38,11 +54,13 @@ class ColorTemperature extends StatelessWidget {
               value: state.temperature.toDouble(),
               min: 1000,
               max: 5000,
+              divisions: 4000,
               onChanged: (double value) {
                 context
                     .read<ColorTemperatureCubit>()
                     .updateTemperature(value.toInt());
               },
+              label: '${state.temperature}K',
             );
           },
         ),

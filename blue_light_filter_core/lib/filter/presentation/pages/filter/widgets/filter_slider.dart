@@ -61,6 +61,7 @@ class FilterSlider extends StatelessWidget {
           max: max,
           divisions: divisions,
           onChanged: onChanged,
+          label: createLabel(value),
         )
       ],
     );
