@@ -22,7 +22,7 @@ class OverlayService {
       'startOverlay',
       {
         'colorValue': colorValue,
-        'alpha':alpha,
+        'alpha': alpha,
       },
     );
   }
@@ -39,5 +39,9 @@ class OverlayService {
         'colorValue': colorValue,
       },
     );
+  }
+
+  static Future<bool> isActive() async {
+    return await _mainChannel.invokeMethod('isActive');
   }
 }

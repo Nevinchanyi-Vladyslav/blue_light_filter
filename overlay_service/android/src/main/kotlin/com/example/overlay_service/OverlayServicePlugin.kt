@@ -92,6 +92,10 @@ class OverlayServicePlugin :
                 result.success(null)
             }
 
+            "isActive" ->{
+                result.success(OverlayService.isRunning)
+            }
+
             else -> {
                 Log.d(OverlayConstants.LOG_TAG, "Unsupported method call ${call.method}")
                 result.notImplemented() // Handle unsupported methods
