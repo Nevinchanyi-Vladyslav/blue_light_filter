@@ -6,7 +6,7 @@ class OverlayService {
   static const MethodChannel _mainChannel =
       MethodChannel('com.example.blue_light_filter_main');
 
-  static const MethodChannel _serviceChannel = MethodChannel('overlay_service');
+  //static const MethodChannel _serviceChannel = MethodChannel('overlay_service');
 
   static Future<bool> checkOverlayPermission() async {
     return await _mainChannel.invokeMethod('checkOverlayPermission');
@@ -16,13 +16,14 @@ class OverlayService {
     await _mainChannel.invokeMethod('requestPermission');
   }
 
-  static Future<void> startOverlay(Color color, {double alpha = 0.8}) async {
+  static Future<void> startOverlay(Color color, Color dim) async {
     final colorValue = color.value;
+    final blackColor = dim.value;
     await _mainChannel.invokeMethod(
       'startOverlay',
       {
         'colorValue': colorValue,
-        'alpha': alpha,
+        'blackColor': blackColor,
       },
     );
   }
@@ -33,7 +34,7 @@ class OverlayService {
 
   static Future<void> updateColor(Color color) async {
     final colorValue = color.value;
-    await _serviceChannel.invokeMethod(
+    await _mainChannel.invokeMethod(
       'updateColor',
       {
         'colorValue': colorValue,
@@ -41,7 +42,19 @@ class OverlayService {
     );
   }
 
+  static Future<void> updateDim(Color color) async {
+    final blackColor = color.value;
+    await _mainChannel.invokeMethod(
+      'updateDim',
+      {
+        'blackColor': blackColor,
+      },
+    );
+  }
+
   static Future<bool> isActive() async {
-    return await _mainChannel.invokeMethod('isActive');
+    return await _mainChannel.invokeMethod(
+      'isActive',
+    );
   }
 }

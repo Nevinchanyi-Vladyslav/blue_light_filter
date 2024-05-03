@@ -1,6 +1,9 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
+import '../cubits/color_temperature/color_temperature_cubit.dart';
 
 class PredefinedTemperature {
   final String title;
@@ -16,11 +19,14 @@ class PredefinedTemperature {
 
 class PredefinedTemperatures extends StatefulWidget {
   const PredefinedTemperatures(
-      {super.key, this.dimension = 60, this.selectedIndex = 0, required this.onSelect});
+      {super.key,
+      this.dimension = 60,
+      this.selectedIndex = -1,
+      required this.onSelect});
 
   final double dimension;
   final int selectedIndex;
-  final void Function(int temperature) onSelect;
+  final void Function(int temperature, String title) onSelect;
 
   @override
   State<PredefinedTemperatures> createState() => _PredefinedTemperaturesState();
@@ -75,46 +81,60 @@ class _PredefinedTemperaturesState extends State<PredefinedTemperatures> {
   @override
   void initState() {
     super.initState();
-    selectedIndex = widget.selectedIndex;
+    _selectedIndex = widget.selectedIndex;
   }
 
-  late int selectedIndex; 
+  late int _selectedIndex;
 
   void onTemperatureTap(int index) {
-    if(index == selectedIndex){
+    if (index == _selectedIndex) {
       return;
     }
     setState(() {
-      selectedIndex = index;
+      _selectedIndex = index;
     });
-    widget.onSelect(_temperatures[index].temperature);
+    final PredefinedTemperature selectedTemperature = _temperatures[index];
+    widget.onSelect(selectedTemperature.temperature, selectedTemperature.title);
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return SizedBox(
-      height: widget.dimension,
-      width: double.infinity,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _temperatures.length,
-        itemBuilder: (_, int index) {
-          return GestureDetector(
-            onTap: () {
-              onTemperatureTap(index);
-            },
-            child: SizedBox(
-              width: widget.dimension,
-              child: Card(
-                color: index == selectedIndex
-                    ? colorScheme.surfaceTint
-                    : colorScheme.surface,
-                child: _temperatures[index].icon,
+    return BlocListener<ColorTemperatureCubit, ColorTemperatureState>(
+      listener: (context, state) {
+        final temperature = state.temperature;
+        final index = _temperatures.indexWhere(
+          (element) => element.temperature == temperature,
+        );
+        if (index != _selectedIndex) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
+      },
+      child: SizedBox(
+        height: widget.dimension,
+        width: double.infinity,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: _temperatures.length,
+          itemBuilder: (_, int index) {
+            return GestureDetector(
+              onTap: () {
+                onTemperatureTap(index);
+              },
+              child: SizedBox(
+                width: widget.dimension,
+                child: Card(
+                  color: index == _selectedIndex
+                      ? colorScheme.surfaceTint
+                      : colorScheme.surface,
+                  child: _temperatures[index].icon,
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

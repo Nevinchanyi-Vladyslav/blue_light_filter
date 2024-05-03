@@ -2,6 +2,7 @@ import 'package:blue_light_filter_core/filter/presentation/pages/filter/cubits/c
 import 'package:blue_light_filter_core/filter/presentation/pages/filter/widgets/filter_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:overlay_service/overlay_service.dart';
 
 class Intensity extends StatelessWidget {
   const Intensity({super.key});
@@ -22,6 +23,14 @@ class Intensity extends StatelessWidget {
           title: 'Intencity',
           description: 'Description',
           createLabel: (value) => '$value%',
+          onChangedEnd: (double intencity) async {
+            final cubit = context.read<ColorIntencityCubit>();
+            await cubit.saveColorIntensity(intencity.toInt());
+            final color = cubit.state.color;
+            if (await OverlayService.isActive()) {
+              await OverlayService.updateColor(color);
+            }
+          },
         );
       },
     );

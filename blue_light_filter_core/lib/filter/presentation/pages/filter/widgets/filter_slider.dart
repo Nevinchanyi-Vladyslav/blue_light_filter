@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'color_slider.dart';
 
@@ -15,6 +16,7 @@ class FilterSlider extends StatelessWidget {
     required this.title,
     required this.description,
     required this.createLabel,
+    this.onChangedEnd,
   });
 
   final Color color;
@@ -23,6 +25,7 @@ class FilterSlider extends StatelessWidget {
   final double max;
   final int? divisions;
   final void Function(double value) onChanged;
+  final void Function(double value)? onChangedEnd;
   final double? dimension;
   final String title;
   final String description;
@@ -62,6 +65,7 @@ class FilterSlider extends StatelessWidget {
           divisions: divisions,
           onChanged: onChanged,
           label: createLabel(value),
+          onChangedEnd: onChangedEnd,
         )
       ],
     );

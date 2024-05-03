@@ -28,7 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name="com.example.overlay_service.overlay.OverlayService" android:exported="false"/>
+        <service android:name="com.example.overlay_service.overlay.OverlayService"/>
 
 <!--        <service android:name="slayer.accessibility.service.flutter_accessibility_service.AccessibilityListener"-->
 <!--                android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:exported="false">-->

@@ -3,13 +3,12 @@ package com.example.overlay_service
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.example.overlay_service.overlay.OverlayConstants
-import com.example.overlay_service.overlay.OverlayService
 import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.embedding.engine.FlutterEngineGroup
@@ -38,24 +37,27 @@ class OverlayServicePlugin :
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
         channel =
-            MethodChannel(binding.binaryMessenger, OverlayConstants.MAIN_CHANNEL)
-        channel!!.setMethodCallHandler(this)
+            MethodChannel(binding.binaryMessenger, OverlayConstants.MAIN_CHANNEL).apply {
+                setMethodCallHandler(this@OverlayServicePlugin)
+            }
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        channel!!.setMethodCallHandler(null)
+        channel?.setMethodCallHandler(null)
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         mActivity = binding.activity
-        if (FlutterEngineCache.getInstance()[OverlayConstants.CACHED_TAG] == null) {
+        Log.d(OverlayConstants.LOG_TAG, "onAttachedToActivity")
+        if (FlutterEngineCache.getInstance()[OverlayConstants.CACHED_ENGINE] == null) {
+            Log.d(OverlayConstants.LOG_TAG, "Cached Flutter Engine")
             val enn = FlutterEngineGroup(context!!)
             val dEntry = DartEntrypoint(
                 FlutterInjector.instance().flutterLoader().findAppBundlePath(),
                 "overlayMain"
             )
             val engine = enn.createAndRunEngine(context!!, dEntry)
-            FlutterEngineCache.getInstance().put(OverlayConstants.CACHED_TAG, engine)
+            FlutterEngineCache.getInstance().put(OverlayConstants.CACHED_ENGINE, engine)
         }
     }
 
@@ -76,8 +78,9 @@ class OverlayServicePlugin :
         when (call.method) {
             "startOverlay" -> {
                 val colorValue = call.argument<Int>("colorValue")!!
-                val alpha = call.argument<Float>("alpha")!!
-                startOverlay(colorValue, alpha)
+                val blackColor = call.argument<Int>("blackColor")!!
+                Log.d(OverlayConstants.LOG_TAG, "startOverlay: $colorValue, $blackColor")
+                startOverlay(colorValue = colorValue, blackColor =  blackColor)
                 result.success(null)
             }
 
@@ -92,8 +95,20 @@ class OverlayServicePlugin :
                 result.success(null)
             }
 
-            "isActive" ->{
+            "isActive" -> {
                 result.success(OverlayService.isRunning)
+            }
+
+            "updateColor" -> {
+                val colorValue = call.argument<Int>("colorValue")!!
+                startOverlay(colorValue = colorValue)
+                result.success(null)
+            }
+
+            "updateDim" -> {
+                val blackColor = call.argument<Int>("blackColor")!!
+                startOverlay(blackColor = blackColor)
+                result.success(null)
             }
 
             else -> {
@@ -106,16 +121,21 @@ class OverlayServicePlugin :
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == REQUEST_CODE_FOR_OVERLAY_PERMISSION) {
-            pendingResult!!.success(checkOverlayPermission())
+            pendingResult?.success(checkOverlayPermission())
             return true
         }
         return false
     }
 
-    private fun startOverlay(colorValue: Int, alpha: Float) {
+    private fun startOverlay(
+        colorValue: Int? = null,
+        blackColor: Int? = null
+    ) {
         val serviceIntent = Intent(context, OverlayService::class.java)
-        serviceIntent.putExtra(OverlayConstants.COLOR_VALUE_EXTRA, colorValue)
-        serviceIntent.putExtra(OverlayConstants.ALPHA_EXTRA, alpha)
+        if (colorValue != null)
+            serviceIntent.putExtra(OverlayConstants.COLOR_VALUE_EXTRA, colorValue)
+        if (blackColor != null)
+            serviceIntent.putExtra(OverlayConstants.BLACK_COLOR_EXTRA, blackColor)
         ContextCompat.startForegroundService(context!!, serviceIntent)
     }
 
@@ -128,8 +148,8 @@ class OverlayServicePlugin :
     private fun requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-            intent.data = Uri.parse("package:${mActivity!!.packageName}")
-            mActivity!!.startActivityForResult(intent, REQUEST_CODE_FOR_OVERLAY_PERMISSION)
+            intent.data = Uri.parse("package:${mActivity?.packageName}")
+            mActivity?.startActivityForResult(intent, REQUEST_CODE_FOR_OVERLAY_PERMISSION)
         }
     }
 
@@ -139,7 +159,7 @@ class OverlayServicePlugin :
                 context,
                 OverlayService::class.java
             )
-            context!!.stopService(i)
+            context?.stopService(i)
         }
     }
 }

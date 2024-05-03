@@ -11,6 +11,7 @@ class ColorSlider extends StatelessWidget {
     required this.onChanged,
     this.dimension = 24,
     this.label,
+    this.onChangedEnd
   });
 
   final Color color;
@@ -19,6 +20,7 @@ class ColorSlider extends StatelessWidget {
   final double max;
   final int? divisions;
   final void Function(double value) onChanged;
+  final void Function(double value)? onChangedEnd;
   final double dimension;
   final String? label;
 
@@ -40,6 +42,7 @@ class ColorSlider extends StatelessWidget {
             label: label,
             divisions: divisions,
             onChanged: onChanged,
+            onChangeEnd: onChangedEnd,
           ),
         ),
       ],
