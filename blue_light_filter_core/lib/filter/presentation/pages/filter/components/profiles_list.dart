@@ -180,7 +180,7 @@ class _ProfilesListState extends State<ProfilesList> {
                                       size: 32,
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .background,
+                                          .onBackground,
                                     ),
                                   ),
                                 ),

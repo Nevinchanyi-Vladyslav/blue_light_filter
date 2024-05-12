@@ -127,7 +127,7 @@ class _PredefinedTemperaturesState extends State<PredefinedTemperatures> {
                 width: widget.dimension,
                 child: Card(
                   color: index == _selectedIndex
-                      ? colorScheme.surfaceTint
+                      ? colorScheme.secondary
                       : colorScheme.surface,
                   child: _temperatures[index].icon,
                 ),
