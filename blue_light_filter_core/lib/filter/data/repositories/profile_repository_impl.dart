@@ -8,12 +8,13 @@ import '../../domain/repositories/profiles_repository.dart';
 
 class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContract {
   late final Database _database;
+  
   final String _tableName = 'profiles';
   final String _id = 'id';
   final String _name = 'name';
-  final String _colorTemperature = 'colorTemperature';
-  final String _colorIntensity = 'colorIntensity';
-  final String _screenDim = 'screenDim';
+  final String _colorTemperature = 'color_temperature';
+  final String _colorIntensity = 'color_intensity';
+  final String _screenDim = 'screen_dim';
 
   ProfilesRepositoryImpl();
 
