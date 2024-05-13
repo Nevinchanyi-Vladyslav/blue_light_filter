@@ -5,41 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "blue_light_filter_core",
-            "cwd": "blue_light_filter_core",
+            "name": "app",
+            "cwd": "app",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "blue_light_filter_core (profile mode)",
-            "cwd": "blue_light_filter_core",
+            "name": "app (profile mode)",
+            "cwd": "app",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "blue_light_filter_core (release mode)",
-            "cwd": "blue_light_filter_core",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        },
-        {
-            "name": "blue_light_filter_main",
-            "cwd": "blue_light_filter_main",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "blue_light_filter_main (profile mode)",
-            "cwd": "blue_light_filter_main",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "blue_light_filter_main (release mode)",
-            "cwd": "blue_light_filter_main",
+            "name": "app (release mode)",
+            "cwd": "app",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
