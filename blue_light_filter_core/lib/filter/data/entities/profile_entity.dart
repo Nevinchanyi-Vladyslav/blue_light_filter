@@ -32,9 +32,9 @@ class ProfileEntity {
     return ProfileEntity(
       id: map['id'],
       name: map['name'],
-      colorTemperature: map['colorTemperature'],
-      colorIntensity: map['colorIntensity'],
-      screenDim: map['screenDim'],
+      colorTemperature: map['color_temperature'],
+      colorIntensity: map['color_intensity'],
+      screenDim: map['screen_dim'],
     );
   }
 
@@ -42,9 +42,9 @@ class ProfileEntity {
     return {
       //'id': id,
       'name': name,
-      'colorTemperature': colorTemperature,
-      'colorIntensity': colorIntensity,
-      'screenDim': screenDim,
+      'color_temperature': colorTemperature,
+      'color_intensity': colorIntensity,
+      'screen_dim': screenDim,
     };
   }
 }

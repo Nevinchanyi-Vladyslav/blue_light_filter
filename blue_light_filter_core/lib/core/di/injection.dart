@@ -23,8 +23,8 @@ Future<void> setup() async {
       SharedPreferences,
     ],
   );
-  sl.registerSingletonWithDependencies<ProfilesRepository>(
-    () => ProfilesRepositoryImpl(),
+  sl.registerSingleton<ProfilesRepository>(
+    ProfilesRepositoryImpl(),
   );
 
   await sl.allReady();

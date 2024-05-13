@@ -13,6 +13,8 @@ dependencies:
     path: ../blue_light_filter_core
   overlay_service: 
     path: ../overlay_service
+  sqflite_db_common:
+    path: ../../sqflite_db_common
 
 dev_dependencies:
   flutter_test:

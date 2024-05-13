@@ -1,4 +1,5 @@
 import 'package:blue_light_filter_core/filter/domain/repositories/profiles_repository.dart';
+import 'package:blue_light_filter_core/filter/presentation/pages/filter/components/battery_optimization.dart';
 import 'package:blue_light_filter_core/filter/presentation/pages/filter/components/color_temperature.dart';
 import 'package:blue_light_filter_core/filter/presentation/pages/filter/components/intensity.dart';
 import 'package:blue_light_filter_core/filter/presentation/pages/filter/components/profiles_list.dart';
@@ -118,6 +119,7 @@ class _FilterPageState extends State<_FilterPage> {
                   ColorTemperature(),
                   Intensity(),
                   ScreenDim(),
+                  BatteryOptimization(),
                 ],
               ),
             ),

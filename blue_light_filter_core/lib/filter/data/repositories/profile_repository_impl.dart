@@ -7,8 +7,8 @@ import 'package:sqflite_db_common/sqflite_db_common.dart';
 import '../../domain/repositories/profiles_repository.dart';
 
 class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContract {
-  late final Database _database;
-  
+  //late final Database _database;
+
   final String _tableName = 'profiles';
   final String _id = 'id';
   final String _name = 'name';
@@ -20,7 +20,7 @@ class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContra
 
   @override
   Future<void> addProfile(ProfileEntity profile) async {
-    await _database.insert(
+    await database.insert(
       _tableName,
       profile.toDbMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -29,7 +29,7 @@ class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContra
 
   @override
   Future<void> deleteProfile(int id) async {
-    await _database.delete(
+    await database.delete(
       _tableName,
       where: 'id = ?',
       whereArgs: [id],
@@ -38,17 +38,12 @@ class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContra
 
   @override
   Future<List<ProfileEntity>> getProfiles() async {
-    final List<Map<String, dynamic>> maps = await _database.query(_tableName);
-    return List.generate(maps.length, (i) {
-      return ProfileEntity.fromMap(
-        maps[i],
-      );
-    });
+    final List<Map<String, dynamic>> maps = await database.query(_tableName);
+    return maps.map((e) => ProfileEntity.fromMap(e)).toList(); 
   }
 
   @override
   FutureOr<void> onCreate(Database db, int version) async {
-    _database = db;
     await db.execute(
           'CREATE TABLE $_tableName('
           '$_id INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -78,4 +73,7 @@ class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContra
           },
         );
   }
+  
+  @override
+  late final Database database;
 }

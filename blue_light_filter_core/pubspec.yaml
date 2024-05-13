@@ -27,6 +27,7 @@ dependencies:
   path: ^1.8.3
   sqflite_db_common:
     path: ../../sqflite_db_common
+  disable_battery_optimization: ^1.1.1
 
 dev_dependencies:
   flutter_test:

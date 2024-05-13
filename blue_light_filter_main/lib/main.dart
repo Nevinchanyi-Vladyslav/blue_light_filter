@@ -1,16 +1,24 @@
+import 'package:blue_light_filter_core/core/di/injection.dart';
+import 'package:blue_light_filter_core/filter/data/repositories/profile_repository_impl.dart';
+import 'package:blue_light_filter_core/filter/domain/repositories/profiles_repository.dart';
 import 'package:blue_light_filter_core/filter/presentation/pages/filter/filter_page.dart';
 import 'package:flutter/material.dart';
 import 'package:blue_light_filter_core/core/di/injection.dart' as di;
 import 'package:flutter/services.dart';
+import 'package:sqflite_db_common/sqflite_db_common.dart';
 
 //bool isServiceEnabled = false;
 const _seedColor = Colors.green;
 final _backgroundColor = Colors.grey.shade900;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // isServiceEnabled =
-  //     await FlutterAccessibilityService.isAccessibilityPermissionEnabled();
   await di.setup();
+  final SQFLiteCommon sqfLiteCommon = SQFLiteCommon();
+  await sqfLiteCommon.init(
+    contracts: [
+      sl<ProfilesRepository>() as ProfilesRepositoryImpl,
+    ],
+  );
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: _backgroundColor,

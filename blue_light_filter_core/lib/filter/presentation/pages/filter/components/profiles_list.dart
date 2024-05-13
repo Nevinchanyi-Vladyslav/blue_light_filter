@@ -31,12 +31,14 @@ class _ProfilesListState extends State<ProfilesList> {
             TextButton(
               child: const Text('No'),
               onPressed: () {
+                _profileNameFieldController.clear();
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: const Text('Yes'),
               onPressed: () {
+                _profileNameFieldController.clear();
                 context
                     .read<ProfilesListCubit>()
                     .deleteProfile(id)
@@ -87,7 +89,6 @@ class _ProfilesListState extends State<ProfilesList> {
                 if (_formKey.currentState?.validate() == true) {
                   // Perform the desired action with the profile name
                   final name = _profileNameFieldController.text.trim();
-                  _profileNameFieldController.clear();
                   final int colorTemperature =
                       context.read<ColorTemperatureCubit>().state.temperature;
                   final int colorIntensity =
@@ -180,7 +181,7 @@ class _ProfilesListState extends State<ProfilesList> {
                                       size: 32,
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .onBackground,
+                                          .onPrimaryContainer,
                                     ),
                                   ),
                                 ),
@@ -298,8 +299,8 @@ class ProfileAvatar extends StatelessWidget {
       child: Center(
         child: Text(
           title.substring(0, 1),
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
