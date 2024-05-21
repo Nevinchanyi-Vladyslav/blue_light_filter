@@ -47,85 +47,90 @@ class OverlayService : Service() {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
             OverlayActions.STOP_OVERLAY_SERVICE -> {
-                Log.d(OverlayConstants.LOG_TAG, "Stopping overlay window service")
-                stopSelf()
+                stopOverlayService()
                 return START_NOT_STICKY
             }
+
             OverlayActions.PAUSE_OVERLAY_SERVICE -> {
-                Log.d(OverlayConstants.LOG_TAG, "Pausing overlay window service")
-                windowManager?.removeView(overlayLayout)
-                val notification = createNotification(
-                    contentText = "Filter paused. Expand notification for more options",
-                    resumeAction = true
-                )
-                val notificationManager = NotificationManagerCompat.from(this)
-                notificationManager.notify(OverlayConstants.NOTIFICATION_ID, notification)
+                pauseOverlayService()
                 return START_NOT_STICKY
             }
+
             OverlayActions.RESUME_OVERLAY_SERVICE -> {
-                Log.d(OverlayConstants.LOG_TAG, "Resuming overlay window service")
-                windowManager?.addView(overlayLayout, createParams(getMaxDimension(windowManager!!)))
-                val notification = createNotification(
-                    contentText = "Filter running in background. Expand notification for more options",
-                    pauseAction = true
-                )
-                val notificationManager = NotificationManagerCompat.from(this)
-                notificationManager.notify(OverlayConstants.NOTIFICATION_ID, notification)
+                resumeOverlayService()
                 return START_NOT_STICKY
             }
+
             else -> {
-                var colorValue: Int? = null
-                var blackColor: Int? = null
-
-                intent?.let {
-                    if (it.hasExtra(OverlayConstants.COLOR_VALUE_EXTRA)) {
-                        colorValue = it.getIntExtra(OverlayConstants.COLOR_VALUE_EXTRA, Color.GRAY)
-                    }
-                    if (it.hasExtra(OverlayConstants.BLACK_COLOR_EXTRA)) {
-                        blackColor = it.getIntExtra(OverlayConstants.BLACK_COLOR_EXTRA, Color.BLACK)
-                    }
-                }
-                Log.d(OverlayConstants.LOG_TAG, "blackColor: $blackColor")
-
-                if (windowManager != null) {
-                    Log.d(OverlayConstants.LOG_TAG, "Updating overlay window service")
-                    if (colorValue != null) {
-                        overlayView?.setBackgroundColor(colorValue!!)
-                    }
-                    if (blackColor != null) {
-                        blackView?.setBackgroundColor(blackColor!!)
-                    }
-                } else {
-                    Log.d(OverlayConstants.LOG_TAG, "Starting overlay window service")
-                    mResources = applicationContext.resources
-                    isRunning = true
-
-                    windowManager = (getSystemService(WINDOW_SERVICE) as WindowManager)
-
-                    val dimension = getMaxDimension(windowManager!!)
-                    val params = createParams(dimension)
-                    params.alpha = 0.8f
-
-                    Log.d(OverlayConstants.LOG_TAG, "Created overlay params")
-
-                    overlayView = createOverlayView(colorValue)
-                    blackView = createOverlayView(blackColor)
-
-                    Log.d(OverlayConstants.LOG_TAG, "Created overlay views")
-
-                    overlayLayout = FrameLayout(this).apply {
-                        addView(overlayView)
-                        addView(blackView)
-                    }
-
-                    Log.d(OverlayConstants.LOG_TAG, "Created overlay layout")
-
-                    windowManager?.addView(overlayLayout, params)
-                }
-
+                startOrUpdateOverlayService(intent)
                 return START_STICKY
             }
         }
+    }
+
+    private fun startOrUpdateOverlayService(intent: Intent?) {
+        val colorValue =
+            if (intent?.hasExtra(OverlayConstants.COLOR_VALUE_EXTRA) == true) intent.getIntExtra(
+                OverlayConstants.COLOR_VALUE_EXTRA,
+                Color.GRAY
+            ) else null
+        Log.d(OverlayConstants.LOG_TAG, "Color value: $colorValue")
+        val blackColor =
+            if (intent?.hasExtra(OverlayConstants.BLACK_COLOR_EXTRA) == true) intent.getIntExtra(
+                OverlayConstants.BLACK_COLOR_EXTRA,
+                Color.BLACK
+            ) else null
+        Log.d(OverlayConstants.LOG_TAG, "Black color: $blackColor")
+
+        if (windowManager != null) {
+            Log.d(OverlayConstants.LOG_TAG, "Updating overlay window service")
+            colorValue?.let { overlayView?.setBackgroundColor(it) }
+            blackColor?.let { blackView?.setBackgroundColor(it) }
+        } else {
+            Log.d(OverlayConstants.LOG_TAG, "Starting overlay window service")
+            initializeOverlayWindow(colorValue, blackColor)
+        }
+    }
+
+    private fun initializeOverlayWindow(colorValue: Int?, blackColor: Int?) {
+        mResources = applicationContext.resources
+        isRunning = true
+
+        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        val dimension = getMaxDimension(windowManager!!)
+        val params = createLayoutParams(dimension).apply { alpha = 0.8f }
+
+        overlayView = createOverlayView(colorValue)
+        blackView = createOverlayView(blackColor)
+        overlayLayout = FrameLayout(this).apply {
+            addView(overlayView)
+            addView(blackView)
+        }
+
+        windowManager?.addView(overlayLayout, params)
+    }
+
+    private fun stopOverlayService() {
+        Log.d(OverlayConstants.LOG_TAG, "Stopping overlay window service")
+        stopSelf()
+    }
+
+    private fun pauseOverlayService() {
+        Log.d(OverlayConstants.LOG_TAG, "Pausing overlay window service")
+        windowManager?.removeView(overlayLayout)
+        updateNotification(
+            contentText = "Filter paused. Expand notification for more options",
+            resumeAction = true
+        )
+    }
+
+    private fun resumeOverlayService() {
+        Log.d(OverlayConstants.LOG_TAG, "Resuming overlay window service")
+        windowManager?.addView(overlayLayout, createLayoutParams(getMaxDimension(windowManager!!)))
+        updateNotification(
+            contentText = "Filter running in background. Expand notification for more options",
+            pauseAction = true
+        )
     }
 
     private fun createOverlayView(
@@ -140,7 +145,7 @@ class OverlayService : Service() {
         return view
     }
 
-    private fun createParams(maxDimension: Int): LayoutParams {
+    private fun createLayoutParams(maxDimension: Int): LayoutParams {
         return LayoutParams(
             maxDimension,
             maxDimension,
@@ -207,23 +212,16 @@ class OverlayService : Service() {
     override fun onDestroy() {
         Log.d(OverlayConstants.LOG_TAG, "Destroying the overlay window service")
         isRunning = false
-
-        windowManager?.let {
-            it.removeView(overlayLayout)
-            overlayView = null
-            blackView = null
-            overlayLayout = null
-        }
-
+        windowManager?.removeView(overlayLayout)
+        overlayView = null
+        blackView = null
+        overlayLayout = null
         windowManager = null
 
-        //Create api version check for stopForeground function
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        else
-            stopForeground(true)
-        val notificationManager =
-            applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) stopForeground(STOP_FOREGROUND_REMOVE)
+        else stopForeground(true)
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(OverlayConstants.NOTIFICATION_ID)
 
         super.onDestroy()
@@ -267,7 +265,6 @@ class OverlayService : Service() {
             .setContentTitle("Blue Light Filter")
             .setContentText(contentText)
             .setContentIntent(pendingIntent)
-            //.setStyle(NotificationCompat.BigTextStyle().bigText(expandedText))
             .setPriority(NotificationCompat.PRIORITY_MAX)
 
 
@@ -295,6 +292,16 @@ class OverlayService : Service() {
         }
 
         return notificationBuilder.build()
+    }
+
+    private fun updateNotification(
+        contentText: String,
+        resumeAction: Boolean = false,
+        pauseAction: Boolean = false
+    ) {
+        val notification =
+            createNotification(contentText, resumeAction = resumeAction, pauseAction = pauseAction)
+        NotificationManagerCompat.from(this).notify(OverlayConstants.NOTIFICATION_ID, notification)
     }
 
     override fun onCreate() {
