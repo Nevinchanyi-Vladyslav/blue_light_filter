@@ -2,6 +2,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:label="Blue Light Filter"
@@ -28,7 +29,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name="com.example.overlay_service.overlay.OverlayService"/>
+        <service android:name="com.example.overlay_service.OverlayService"/>
+
+        <receiver android:name="com.example.overlay_service.ActionsReceiver"/>
 
 <!--        <service android:name="slayer.accessibility.service.flutter_accessibility_service.AccessibilityListener"-->
 <!--                android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:exported="false">-->

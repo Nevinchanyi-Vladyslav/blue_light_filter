@@ -18,11 +18,12 @@ class PredefinedTemperature {
 }
 
 class PredefinedTemperatures extends StatefulWidget {
-  const PredefinedTemperatures(
-      {super.key,
-      this.dimension = 60,
-      this.selectedIndex = -1,
-      required this.onSelect});
+  const PredefinedTemperatures({
+    super.key,
+    this.dimension = 60,
+    this.selectedIndex = -1,
+    required this.onSelect,
+  });
 
   final double dimension;
   final int selectedIndex;

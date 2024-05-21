@@ -1,5 +1,6 @@
 package com.example.overlay_service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -18,7 +19,9 @@ import android.view.WindowManager
 import android.view.WindowManager.LayoutParams
 import android.widget.FrameLayout
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import kotlin.math.max
+
 
 class OverlayService : Service() {
 
@@ -42,56 +45,87 @@ class OverlayService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        var colorValue: Int? = null
-        var blackColor: Int? = null
-
-        intent?.let {
-            if (it.hasExtra(OverlayConstants.COLOR_VALUE_EXTRA)) {
-                colorValue = it.getIntExtra(OverlayConstants.COLOR_VALUE_EXTRA, Color.GRAY)
+        when (intent?.action) {
+            OverlayActions.STOP_OVERLAY_SERVICE -> {
+                Log.d(OverlayConstants.LOG_TAG, "Stopping overlay window service")
+                stopSelf()
+                return START_NOT_STICKY
             }
-            if (it.hasExtra(OverlayConstants.BLACK_COLOR_EXTRA)) {
-                blackColor = it.getIntExtra(OverlayConstants.BLACK_COLOR_EXTRA, Color.BLACK)
+            OverlayActions.PAUSE_OVERLAY_SERVICE -> {
+                Log.d(OverlayConstants.LOG_TAG, "Pausing overlay window service")
+                windowManager?.removeView(overlayLayout)
+                val notification = createNotification(
+                    contentText = "Filter paused. Expand notification for more options",
+                    resumeAction = true
+                )
+                val notificationManager = NotificationManagerCompat.from(this)
+                notificationManager.notify(OverlayConstants.NOTIFICATION_ID, notification)
+                return START_NOT_STICKY
+            }
+            OverlayActions.RESUME_OVERLAY_SERVICE -> {
+                Log.d(OverlayConstants.LOG_TAG, "Resuming overlay window service")
+                windowManager?.addView(overlayLayout, createParams(getMaxDimension(windowManager!!)))
+                val notification = createNotification(
+                    contentText = "Filter running in background. Expand notification for more options",
+                    pauseAction = true
+                )
+                val notificationManager = NotificationManagerCompat.from(this)
+                notificationManager.notify(OverlayConstants.NOTIFICATION_ID, notification)
+                return START_NOT_STICKY
+            }
+            else -> {
+                var colorValue: Int? = null
+                var blackColor: Int? = null
+
+                intent?.let {
+                    if (it.hasExtra(OverlayConstants.COLOR_VALUE_EXTRA)) {
+                        colorValue = it.getIntExtra(OverlayConstants.COLOR_VALUE_EXTRA, Color.GRAY)
+                    }
+                    if (it.hasExtra(OverlayConstants.BLACK_COLOR_EXTRA)) {
+                        blackColor = it.getIntExtra(OverlayConstants.BLACK_COLOR_EXTRA, Color.BLACK)
+                    }
+                }
+                Log.d(OverlayConstants.LOG_TAG, "blackColor: $blackColor")
+
+                if (windowManager != null) {
+                    Log.d(OverlayConstants.LOG_TAG, "Updating overlay window service")
+                    if (colorValue != null) {
+                        overlayView?.setBackgroundColor(colorValue!!)
+                    }
+                    if (blackColor != null) {
+                        blackView?.setBackgroundColor(blackColor!!)
+                    }
+                } else {
+                    Log.d(OverlayConstants.LOG_TAG, "Starting overlay window service")
+                    mResources = applicationContext.resources
+                    isRunning = true
+
+                    windowManager = (getSystemService(WINDOW_SERVICE) as WindowManager)
+
+                    val dimension = getMaxDimension(windowManager!!)
+                    val params = createParams(dimension)
+                    params.alpha = 0.8f
+
+                    Log.d(OverlayConstants.LOG_TAG, "Created overlay params")
+
+                    overlayView = createOverlayView(colorValue)
+                    blackView = createOverlayView(blackColor)
+
+                    Log.d(OverlayConstants.LOG_TAG, "Created overlay views")
+
+                    overlayLayout = FrameLayout(this).apply {
+                        addView(overlayView)
+                        addView(blackView)
+                    }
+
+                    Log.d(OverlayConstants.LOG_TAG, "Created overlay layout")
+
+                    windowManager?.addView(overlayLayout, params)
+                }
+
+                return START_STICKY
             }
         }
-        Log.d(OverlayConstants.LOG_TAG, "blackColor: $blackColor")
-
-        if (windowManager != null) {
-            Log.d(OverlayConstants.LOG_TAG, "Updating overlay window service")
-            if (colorValue != null) {
-                overlayView?.setBackgroundColor(colorValue!!)
-            }
-            if (blackColor != null) {
-                blackView?.setBackgroundColor(blackColor!!)
-            }
-        } else {
-            Log.d(OverlayConstants.LOG_TAG, "Starting overlay window service")
-            mResources = applicationContext.resources
-            isRunning = true
-
-            windowManager = (getSystemService(WINDOW_SERVICE) as WindowManager)
-
-            val dimension = getMaxDimension(windowManager!!)
-            val params = createParams(dimension)
-            params.alpha = 0.8f
-
-            Log.d(OverlayConstants.LOG_TAG, "Created overlay params")
-
-            overlayView = createOverlayView(colorValue)
-            blackView = createOverlayView(blackColor)
-
-            Log.d(OverlayConstants.LOG_TAG, "Created overlay views")
-
-            overlayLayout = FrameLayout(this).apply {
-                addView(overlayView)
-                addView(blackView)
-            }
-
-            Log.d(OverlayConstants.LOG_TAG, "Created overlay layout")
-
-            windowManager?.addView(overlayLayout, params)
-        }
-
-        return START_STICKY
     }
 
     private fun createOverlayView(
@@ -184,7 +218,7 @@ class OverlayService : Service() {
         windowManager = null
 
         //Create api version check for stopForeground function
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             stopForeground(STOP_FOREGROUND_REMOVE)
         else
             stopForeground(true)
@@ -195,27 +229,81 @@ class OverlayService : Service() {
         super.onDestroy()
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        createNotificationChannel()
-        val notificationIntent = Intent(this, OverlayServicePlugin::class.java)
-        val pendingFlags: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    private fun createBroadcastPendingIntentWithAction(
+        action: String,
+        pendingFlags: Int
+    ): PendingIntent {
+        val intent = Intent(this, ActionsReceiver::class.java)
+        intent.action = action
+        return PendingIntent.getBroadcast(
+            this,
+            0,
+            intent,
+            pendingFlags
+        )
+    }
+
+    private fun createPendingFlags(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.FLAG_IMMUTABLE
         } else {
             PendingIntent.FLAG_UPDATE_CURRENT
         }
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0, notificationIntent, pendingFlags
-        )
-        val notifyIcon: Int = getDrawableResourceId("mipmap", "launcher")
-        val notification = NotificationCompat.Builder(
-            this,
-            OverlayConstants.CHANNEL_ID
-        )
-            .setSmallIcon(if (notifyIcon == 0) R.drawable.notification_icon else notifyIcon)
+    }
+
+    private fun createNotification(
+        contentText: String = "Expand notification for more options",
+        stopAction: Boolean = true,
+        pauseAction: Boolean = false,
+        resumeAction: Boolean = false
+    ): Notification {
+        val notificationIntent = Intent(this, OverlayServicePlugin::class.java)
+        val pendingFlags = createPendingFlags()
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, pendingFlags)
+
+        val notifyIcon = getDrawableResourceId("drawable", "ic_app_notification")
+        val notificationBuilder = NotificationCompat.Builder(this, OverlayConstants.CHANNEL_ID)
+            .setSmallIcon(if (notifyIcon == 0) R.drawable.outline_shield_24 else notifyIcon)
+            .setContentTitle("Blue Light Filter")
+            .setContentText(contentText)
             .setContentIntent(pendingIntent)
-            .build()
+            //.setStyle(NotificationCompat.BigTextStyle().bigText(expandedText))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+
+
+        if (stopAction) {
+            val stopPendingIntent = createBroadcastPendingIntentWithAction(
+                OverlayActions.STOP_OVERLAY_SERVICE, pendingFlags
+            )
+            notificationBuilder.addAction(R.drawable.baseline_close_24, "Stop", stopPendingIntent)
+        }
+        if (pauseAction) {
+            val pausePendingIntent = createBroadcastPendingIntentWithAction(
+                OverlayActions.PAUSE_OVERLAY_SERVICE, pendingFlags
+            )
+            notificationBuilder.addAction(R.drawable.outline_pause_24, "Pause", pausePendingIntent)
+        }
+        if (resumeAction) {
+            val resumePendingIntent = createBroadcastPendingIntentWithAction(
+                OverlayActions.RESUME_OVERLAY_SERVICE, pendingFlags
+            )
+            notificationBuilder.addAction(
+                R.drawable.baseline_play_arrow_24,
+                "Resume",
+                resumePendingIntent
+            )
+        }
+
+        return notificationBuilder.build()
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+        val notification = createNotification(
+            contentText = "Filter running in background. Expand notification for more options",
+            pauseAction = true,
+        )
         startForeground(
             OverlayConstants.NOTIFICATION_ID,
             notification
