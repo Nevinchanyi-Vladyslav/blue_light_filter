@@ -32,6 +32,14 @@ class OverlayService : Service() {
 
     companion object {
         var isRunning = false
+            set(value) {
+                field = value
+                Log.d(OverlayConstants.LOG_TAG, "Service running: $value")
+                OverlayServicePlugin.isServiceRunningMethodChannel!!.invokeMethod(
+                    "notifyServiceRunning",
+                    value
+                )
+            }
 
         //var instance: OverlayService? = null
         private const val DEFAULT_NAV_BAR_HEIGHT_DP = 48
@@ -62,6 +70,9 @@ class OverlayService : Service() {
             }
 
             else -> {
+                if (!isRunning && windowManager != null) {
+                    resumeOverlayService()
+                }
                 startOrUpdateOverlayService(intent)
                 return START_STICKY
             }
@@ -112,23 +123,28 @@ class OverlayService : Service() {
 
     private fun stopOverlayService() {
         Log.d(OverlayConstants.LOG_TAG, "Stopping overlay window service")
+        isRunning = false
         stopSelf()
     }
 
     private fun pauseOverlayService() {
         Log.d(OverlayConstants.LOG_TAG, "Pausing overlay window service")
+        isRunning = false
         windowManager?.removeView(overlayLayout)
         updateNotification(
-            contentText = "Filter paused. Expand notification for more options",
+            contentTitle = "Blue Light Filter is paused",
+
             resumeAction = true
         )
     }
 
     private fun resumeOverlayService() {
         Log.d(OverlayConstants.LOG_TAG, "Resuming overlay window service")
+        isRunning = true
         windowManager?.addView(overlayLayout, createLayoutParams(getMaxDimension(windowManager!!)))
         updateNotification(
-            contentText = "Filter running in background. Expand notification for more options",
+            contentTitle = "Blue Light Filter is running",
+
             pauseAction = true
         )
     }
@@ -250,6 +266,7 @@ class OverlayService : Service() {
     }
 
     private fun createNotification(
+        contentTitle: String,
         contentText: String = "Expand notification for more options",
         stopAction: Boolean = true,
         pauseAction: Boolean = false,
@@ -262,12 +279,11 @@ class OverlayService : Service() {
         val notifyIcon = getDrawableResourceId("drawable", "ic_app_notification")
         val notificationBuilder = NotificationCompat.Builder(this, OverlayConstants.CHANNEL_ID)
             .setSmallIcon(if (notifyIcon == 0) R.drawable.outline_shield_24 else notifyIcon)
-            .setContentTitle("Blue Light Filter")
+            .setContentTitle(contentTitle)
             .setContentText(contentText)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_MAX)
-
-
+        
         if (stopAction) {
             val stopPendingIntent = createBroadcastPendingIntentWithAction(
                 OverlayActions.STOP_OVERLAY_SERVICE, pendingFlags
@@ -295,12 +311,18 @@ class OverlayService : Service() {
     }
 
     private fun updateNotification(
-        contentText: String,
+        contentTitle: String,
+        contentText: String = "Expand notification for more options",
         resumeAction: Boolean = false,
         pauseAction: Boolean = false
     ) {
         val notification =
-            createNotification(contentText, resumeAction = resumeAction, pauseAction = pauseAction)
+            createNotification(
+                contentTitle = contentTitle,
+                contentText = contentText,
+                resumeAction = resumeAction,
+                pauseAction = pauseAction
+            )
         NotificationManagerCompat.from(this).notify(OverlayConstants.NOTIFICATION_ID, notification)
     }
 
@@ -308,7 +330,8 @@ class OverlayService : Service() {
         super.onCreate()
         createNotificationChannel()
         val notification = createNotification(
-            contentText = "Filter running in background. Expand notification for more options",
+            contentTitle = "Blue Light Filter is running",
+            contentText = "Expand notification for more options",
             pauseAction = true,
         )
         startForeground(

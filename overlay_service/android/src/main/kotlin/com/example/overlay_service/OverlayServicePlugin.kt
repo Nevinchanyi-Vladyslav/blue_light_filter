@@ -32,6 +32,7 @@ class OverlayServicePlugin :
 
     companion object {
         private const val REQUEST_CODE_FOR_OVERLAY_PERMISSION = 1248
+        var isServiceRunningMethodChannel:MethodChannel? = null
     }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -39,6 +40,7 @@ class OverlayServicePlugin :
         channel = MethodChannel(binding.binaryMessenger, OverlayConstants.MAIN_CHANNEL).apply {
             setMethodCallHandler(this@OverlayServicePlugin)
         }
+        isServiceRunningMethodChannel = MethodChannel(binding.binaryMessenger, OverlayConstants.IS_SERVICE_RUNNING_CHANNEL)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -87,8 +89,12 @@ class OverlayServicePlugin :
     }
 
     private fun handleStartOverlay(call: MethodCall, result: MethodChannel.Result) {
-        val colorValue = call.argument<Int>("colorValue")
-        val blackColor = call.argument<Int>("blackColor")
+        Log.d(OverlayConstants.LOG_TAG, "startOverlay: ${call.arguments}")
+        val arguments = call.arguments<List<Int>>()!!
+//        val colorValue = call.argument<Int>("colorValue")
+//        val blackColor = call.argument<Int>("blackColor")
+        val colorValue = arguments[0]
+        val blackColor = arguments[1]
         Log.d(OverlayConstants.LOG_TAG, "startOverlay: $colorValue, $blackColor")
         startOverlay(colorValue, blackColor)
         result.success(null)

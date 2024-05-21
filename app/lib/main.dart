@@ -5,6 +5,7 @@ import 'package:blue_light_filter/filter/presentation/pages/filter/filter_page.d
 import 'package:flutter/material.dart';
 import 'package:blue_light_filter/core/di/injection.dart' as di;
 import 'package:flutter/services.dart';
+import 'package:overlay_service/overlay_service_native_communicator.dart';
 import 'package:sqflite_db_common/sqflite_db_common.dart';
 
 //bool isServiceEnabled = false;
@@ -12,6 +13,7 @@ const _seedColor = Colors.green;
 final _backgroundColor = Colors.grey.shade900;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  OverlayServiceNativeCommunicator.init();
   await di.setup();
   final SQFLiteCommon sqfLiteCommon = SQFLiteCommon();
   await sqfLiteCommon.init(

@@ -1,8 +1,8 @@
 package com.example.overlay_service
 
 object OverlayConstants {
-    const val CACHED_ENGINE = "cachedEngine"
     const val MAIN_CHANNEL = "com.example.blue_light_filter_main"
+    const val IS_SERVICE_RUNNING_CHANNEL = "is_service_running"
 
     // const val OVERLAY_SERVICE_CHANNEL = "overlay_service"
     const val CHANNEL_ID = "Overlay Channel"

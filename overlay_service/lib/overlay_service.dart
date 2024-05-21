@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 
 class OverlayService {
@@ -5,8 +7,6 @@ class OverlayService {
 
   static const MethodChannel _mainChannel =
       MethodChannel('com.example.blue_light_filter_main');
-
-  //static const MethodChannel _serviceChannel = MethodChannel('overlay_service');
 
   static Future<bool> checkOverlayPermission() async {
     return await _mainChannel.invokeMethod('checkOverlayPermission');
@@ -19,13 +19,10 @@ class OverlayService {
   static Future<void> startOverlay(Color color, Color dim) async {
     final colorValue = color.value;
     final blackColor = dim.value;
-    await _mainChannel.invokeMethod(
-      'startOverlay',
-      {
-        'colorValue': colorValue,
-        'blackColor': blackColor,
-      },
-    );
+    await _mainChannel.invokeMethod('startOverlay', [
+      colorValue,
+      blackColor,
+    ]);
   }
 
   static Future<void> stopOverlay() async {

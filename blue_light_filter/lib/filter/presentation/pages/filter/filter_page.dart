@@ -10,6 +10,7 @@ import 'package:blue_light_filter/filter/service/color_intencity_converter.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:overlay_service/overlay_service.dart';
+import 'package:overlay_service/overlay_service_native_communicator.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../data/repositories/filter_settings_repository_impl.dart';
@@ -67,16 +68,6 @@ class _FilterPage extends StatefulWidget {
 }
 
 class _FilterPageState extends State<_FilterPage> {
-  var overlayShowing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    OverlayService.isActive().then((value) {
-      overlayShowing = value;
-      setState(() {});
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,8 +93,14 @@ class _FilterPageState extends State<_FilterPage> {
             final blackAlpha = (dim / 100 * 255).clamp(0, 255).toInt();
             onStartClick(currentColor, Colors.black.withAlpha(blackAlpha));
           },
-          child: Icon(
-            overlayShowing ? Icons.pause : Icons.play_arrow,
+          child: StreamBuilder<bool>(
+            stream: OverlayServiceNativeCommunicator.isServiceRunningStream,
+            builder: (context, snapshot) {
+              final isRunning = snapshot.data ?? false;
+              return Icon(
+                isRunning ? Icons.pause : Icons.play_arrow,
+              );
+            }
           ),
         ),
         body: const SafeArea(
@@ -134,13 +131,11 @@ class _FilterPageState extends State<_FilterPage> {
     if (!status) {
       await OverlayService.requestPermission();
     }
-    overlayShowing = await OverlayService.isActive();
-    if (overlayShowing) {
+    if (await OverlayService.isActive()) {
       await OverlayService.stopOverlay();
     } else {
       await OverlayService.startOverlay(color, blackColor);
     }
-    overlayShowing = !overlayShowing;
     setState(() {});
   }
 }
