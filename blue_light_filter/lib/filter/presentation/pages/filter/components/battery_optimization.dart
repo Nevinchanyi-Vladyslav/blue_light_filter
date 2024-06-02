@@ -63,7 +63,7 @@ class _BatteryOptimizationState extends State<BatteryOptimization> {
                     ],
                   ),
                   Text(
-                    'battery_optimization_message'.tr(),
+                    'battery_optimization_enabled'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
