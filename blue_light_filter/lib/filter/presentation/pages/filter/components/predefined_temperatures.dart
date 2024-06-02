@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,43 +36,44 @@ class PredefinedTemperatures extends StatefulWidget {
 
 class _PredefinedTemperaturesState extends State<PredefinedTemperatures> {
   final List<PredefinedTemperature> _temperatures = [
+    
     PredefinedTemperature(
-      title: 'Candle',
+      title: 'candle'.tr(),
       icon: Icon(
         MdiIcons.candle,
       ),
       temperature: 1800,
     ),
     PredefinedTemperature(
-      title: 'Moonlight',
+      title: 'moonlight'.tr(),
       icon: const Icon(
         EvaIcons.moon,
       ),
       temperature: 3200,
     ),
     PredefinedTemperature(
-      title: 'Lamp',
+      title: 'lamp'.tr(),
       icon: const Icon(
         Icons.lightbulb,
       ),
       temperature: 2700,
     ),
     PredefinedTemperature(
-      title: 'Sunlight',
+      title: 'sunlight'.tr(),
       icon: const Icon(
         Icons.sunny,
       ),
       temperature: 4500,
     ),
     PredefinedTemperature(
-      title: 'Forest',
+      title: 'forest'.tr(),
       icon: Icon(
         MdiIcons.forest,
       ),
       temperature: 3300,
     ),
     PredefinedTemperature(
-      title: 'Sundown',
+      title: 'sundown'.tr(),
       icon: const Icon(
         Icons.sunny_snowing,
       ),

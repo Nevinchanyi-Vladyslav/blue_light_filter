@@ -2,6 +2,7 @@ import 'package:blue_light_filter/core/di/injection.dart';
 import 'package:blue_light_filter/filter/data/repositories/profile_repository_impl.dart';
 import 'package:blue_light_filter/filter/domain/repositories/profiles_repository.dart';
 import 'package:blue_light_filter/filter/presentation/pages/filter/filter_page.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:blue_light_filter/core/di/injection.dart' as di;
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ const _seedColor = Colors.green;
 final _backgroundColor = Colors.grey.shade900;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   OverlayServiceNativeCommunicator.init();
   await di.setup();
   final SQFLiteCommon sqfLiteCommon = SQFLiteCommon();
@@ -21,13 +23,26 @@ void main() async {
       sl<ProfilesRepository>() as ProfilesRepositoryImpl,
     ],
   );
+  
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: _backgroundColor,
       systemNavigationBarColor: _seedColor,
     ),
   );
-  runApp(const MainApp());
+
+  runApp(
+    EasyLocalization(
+      useOnlyLangCode: true,
+      supportedLocales: const [
+        Locale('en'),
+        Locale('uk'),
+      ],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatefulWidget {
@@ -41,13 +56,16 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           brightness: Brightness.dark,
           seedColor: _seedColor,
           primary: _seedColor,
-          secondary: Colors.red, 
+          secondary: Colors.red,
           inverseSurface: Colors.red,
           inversePrimary: Colors.white,
           onInverseSurface: Colors.white,

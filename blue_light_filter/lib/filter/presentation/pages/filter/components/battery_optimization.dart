@@ -1,4 +1,5 @@
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class BatteryOptimization extends StatefulWidget {
@@ -41,10 +42,10 @@ class _BatteryOptimizationState extends State<BatteryOptimization> {
                 children: [
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Warning!',
-                          style: TextStyle(
+                          'warning'.tr(),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                           ),
@@ -61,16 +62,16 @@ class _BatteryOptimizationState extends State<BatteryOptimization> {
                       ),
                     ],
                   ),
-                  const Text(
-                    'Battery optimization is enabled. Please disable it to ensure proper functionality in background.',
-                    style: TextStyle(
+                  Text(
+                    'battery_optimization_enabled'.tr(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                     ),
                   ),
                   ElevatedButton(
-                    child: const Text(
-                      'Change battery optimization',
+                    child: Text(
+                      'change_battery_optimization'.tr(),
                     ),
                     onPressed: () async {
                       await openBatterySaver();

@@ -1,5 +1,6 @@
 import 'package:blue_light_filter/filter/presentation/pages/filter/cubits/color_intencity/color_intencity_cubit.dart';
 import 'package:blue_light_filter/filter/presentation/pages/filter/widgets/color_slider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:overlay_service/overlay_service.dart';
@@ -20,7 +21,7 @@ class ColorTemperature extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Color Temperature',
+                'color_temperature'.tr(),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
@@ -35,7 +36,7 @@ class ColorTemperature extends StatelessWidget {
           ],
         ),
         Text(
-          'Predefined temperatures',
+          'predefined_temperatures'.tr(),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         PredefinedTemperatures(
@@ -48,7 +49,7 @@ class ColorTemperature extends StatelessWidget {
               SnackBar(
                 content: Text(title),
                 action: SnackBarAction(
-                  label: 'Ok',
+                  label: "ok".tr(),
                   onPressed: () {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   },

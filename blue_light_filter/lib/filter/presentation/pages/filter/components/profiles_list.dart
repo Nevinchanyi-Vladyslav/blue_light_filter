@@ -1,5 +1,6 @@
 import 'package:blue_light_filter/filter/data/entities/profile_entity.dart';
 import 'package:blue_light_filter/filter/presentation/pages/filter/cubits/current_profile/current_profile_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,18 +26,18 @@ class _ProfilesListState extends State<ProfilesList> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: const Text('Delete Profile'),
-          content: const Text('Are you sure you want to delete this profile?'),
+          title: Text('delete_profile'.tr()),
+          content: Text('delete_profile_message'.tr()),
           actions: [
             TextButton(
-              child: const Text('No'),
+              child: Text('no'.tr()),
               onPressed: () {
                 _profileNameFieldController.clear();
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Yes'),
+              child: Text('yes'.tr()),
               onPressed: () {
                 _profileNameFieldController.clear();
                 context
@@ -60,17 +61,17 @@ class _ProfilesListState extends State<ProfilesList> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: const Text('Add Profile'),
+          title: Text('add_profile'.tr()),
           content: Form(
             key: _formKey,
             child: TextFormField(
               controller: _profileNameFieldController,
-              decoration: const InputDecoration(
-                labelText: 'Profile Name',
+              decoration: InputDecoration(
+                labelText: 'profile_name'.tr(),
               ),
               validator: (value) {
                 if (value?.isEmpty == true) {
-                  return 'Please enter a profile name';
+                  return 'please_enter_profile_name'.tr();
                 }
                 return null;
               },
@@ -78,13 +79,13 @@ class _ProfilesListState extends State<ProfilesList> {
           ),
           actions: [
             TextButton(
-              child: const Text('No'),
+              child: Text('no'.tr()),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Yes'),
+              child: Text('yes'.tr()),
               onPressed: () async {
                 if (_formKey.currentState?.validate() == true) {
                   // Perform the desired action with the profile name
@@ -128,13 +129,16 @@ class _ProfilesListState extends State<ProfilesList> {
           children: [
             Expanded(
               child: Text(
-                'Profiles',
+                'profiles'.tr(),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
-            Text(
-              '(Saved filter settings by the user)',
-              style: Theme.of(context).textTheme.bodySmall,
+            Expanded(
+              child: Text(
+                'saved_profile_settings'.tr(),
+                style: Theme.of(context).textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -189,7 +193,7 @@ class _ProfilesListState extends State<ProfilesList> {
                             ),
                             Expanded(
                               child: Text(
-                                'Add',
+                                'add'.tr(),
                                 style: Theme.of(context).textTheme.labelSmall,
                                 textAlign: TextAlign.center,
                               ),
@@ -267,8 +271,8 @@ class _ProfilesListState extends State<ProfilesList> {
                   },
                 );
               } else {
-                return const Center(
-                  child: Text('Error loading profiles'),
+                return Center(
+                  child: Text('error_loading_profiles'.tr()),
                 );
               }
             },
