@@ -132,7 +132,7 @@ class OverlayService : Service() {
         isRunning = false
         windowManager?.removeView(overlayLayout)
         updateNotification(
-            contentTitle = "Blue Light Filter is paused",
+            contentTitle = getString(R.string.context_title_pause),
 
             resumeAction = true
         )
@@ -143,7 +143,7 @@ class OverlayService : Service() {
         isRunning = true
         windowManager?.addView(overlayLayout, createLayoutParams(getMaxDimension(windowManager!!)))
         updateNotification(
-            contentTitle = "Blue Light Filter is running",
+            contentTitle = getString(R.string.context_title_resume),
 
             pauseAction = true
         )
@@ -267,7 +267,7 @@ class OverlayService : Service() {
 
     private fun createNotification(
         contentTitle: String,
-        contentText: String = "Expand notification for more options",
+        contentText: String = getString(R.string.context_text),
         stopAction: Boolean = true,
         pauseAction: Boolean = false,
         resumeAction: Boolean = false
@@ -288,13 +288,13 @@ class OverlayService : Service() {
             val stopPendingIntent = createBroadcastPendingIntentWithAction(
                 OverlayActions.STOP_OVERLAY_SERVICE, pendingFlags
             )
-            notificationBuilder.addAction(R.drawable.baseline_close_24, "Stop", stopPendingIntent)
+            notificationBuilder.addAction(R.drawable.baseline_close_24, getString(R.string.stop), stopPendingIntent)
         }
         if (pauseAction) {
             val pausePendingIntent = createBroadcastPendingIntentWithAction(
                 OverlayActions.PAUSE_OVERLAY_SERVICE, pendingFlags
             )
-            notificationBuilder.addAction(R.drawable.outline_pause_24, "Pause", pausePendingIntent)
+            notificationBuilder.addAction(R.drawable.outline_pause_24, getString(R.string.pause), pausePendingIntent)
         }
         if (resumeAction) {
             val resumePendingIntent = createBroadcastPendingIntentWithAction(
@@ -302,7 +302,7 @@ class OverlayService : Service() {
             )
             notificationBuilder.addAction(
                 R.drawable.baseline_play_arrow_24,
-                "Resume",
+                getString(R.string.play),
                 resumePendingIntent
             )
         }
@@ -312,7 +312,7 @@ class OverlayService : Service() {
 
     private fun updateNotification(
         contentTitle: String,
-        contentText: String = "Expand notification for more options",
+        contentText: String = getString(R.string.context_text),
         resumeAction: Boolean = false,
         pauseAction: Boolean = false
     ) {
@@ -330,8 +330,8 @@ class OverlayService : Service() {
         super.onCreate()
         createNotificationChannel()
         val notification = createNotification(
-            contentTitle = "Blue Light Filter is running",
-            contentText = "Expand notification for more options",
+            contentTitle = getString(R.string.context_title_resume),
+            contentText = getString(R.string.context_text),
             pauseAction = true,
         )
         startForeground(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:blue_light_filter/filter/data/entities/profile_entity.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_db_common/sqflite_db_common.dart';
 
@@ -57,7 +58,7 @@ class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContra
         await db.insert(
           _tableName,
           {
-            _name: 'Default',
+            _name: 'default'.tr(),
             _colorTemperature: 1500,
             _colorIntensity: 40,
             _screenDim: 10,
@@ -66,7 +67,7 @@ class ProfilesRepositoryImpl extends ProfilesRepository implements SQFLiteContra
         await db.insert(
           _tableName,
           {
-            _name: 'Bed reading',
+            _name: 'bed_reading'.tr(),
             _colorTemperature: 1000,
             _colorIntensity: 50,
             _screenDim: 50,
